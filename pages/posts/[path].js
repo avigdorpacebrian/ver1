@@ -8,7 +8,7 @@ const domain = process.env.NEXT_PUBLIC_DOMAIN_URL;
 function PostDetail({ data, host }) {
   const router = useRouter();
   const {
-    query: { path, postid },
+    query: { path },
   } = router;
 
   const isRedirect =
@@ -16,13 +16,12 @@ function PostDetail({ data, host }) {
       (window.location.search ||
         (typeof document !== "undefined" &&
           document.referrer.indexOf("facebook.com") !== -1)) &&
-      path &&
-      postid
+      path
       ? true
       : false;
 
   if (isRedirect) {
-    window.location.href = `${domain}${postid}/${path}`;
+    window.location.href = `${domain}${path}`;
   }
 
   return (
@@ -35,7 +34,7 @@ function PostDetail({ data, host }) {
         {data.image && <meta name="og:image" content={data.image} />}
         {data.title && data.image && <meta name="og:image:alt" content={data.title} />}
         {data.destination && <meta name="og:destination" content={data.destination} />}
-        {host && <meta name="og:url" content={`https://${host}/posts/${postid}/${path}`} />}
+        {host && <meta name="og:url" content={`https://${host}/posts/${path}`} />}
         {host && <meta property="og:site_name" content={host.split('.')[0]} />}
         <link rel="icon" href="/favicon.ico" />
       </Head>
@@ -51,7 +50,7 @@ function PostDetail({ data, host }) {
 
 // This gets called on every request
 export async function getServerSideProps(context) {
-  const { path, postid } = context.params;
+  const { path } = context.params;
   const referringURL = context.req.headers?.referer || null;
   const fbclid = context.query.fbclid;
 
@@ -59,13 +58,13 @@ export async function getServerSideProps(context) {
     return {
       redirect: {
         permanent: false,
-        destination: `${domain}${postid}/${encodeURI(path)}`,
+        destination: `${domain}/${encodeURI(path)}`,
       },
     };
   }
 
   // Fetch data from external API
-  const data = await fetch(`${domain}${postid}/${path}`)
+  const data = await fetch(`${domain}/${path}`)
     .then(function (response) {
       // When the page is loaded convert it to text
       return response.text();
