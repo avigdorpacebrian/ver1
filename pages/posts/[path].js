@@ -66,6 +66,7 @@ export async function getServerSideProps(context) {
   // Fetch data from external API
   const data = await fetch(`${domain}/${path}`)
     .then(function (response) {
+
       // When the page is loaded convert it to text
       return response.text();
     })
@@ -74,20 +75,24 @@ export async function getServerSideProps(context) {
 
       // // Parse the text
       const doc = parse(html);
+      // console.log("doc=", doc);
 
       const articleData = {
         image:
           doc
-            .querySelector('meta[property~="og:image"]')
-            .getAttribute("content") || "",
+            .querySelector('meta[property~="og:image"]') ?
+            doc
+              .querySelector('meta[property~="og:image"]').getAttribute("content") : "",
         title:
           doc
-            .querySelector('meta[property~="og:title"]')
-            .getAttribute("content") || "",
+            .querySelector('meta[property~="og:title"]') ?
+            doc
+              .querySelector('meta[property~="og:title"]').getAttribute("content") : "",
         destination:
           doc
-            .querySelector('meta[property~="og:description"]')
-            .getAttribute("content") || "",
+            .querySelector('meta[property~="og:description"]') ?
+            doc
+              .querySelector('meta[property~="og:description"]').getAttribute("content") : "",
       };
 
       return JSON.parse(JSON.stringify(articleData));
